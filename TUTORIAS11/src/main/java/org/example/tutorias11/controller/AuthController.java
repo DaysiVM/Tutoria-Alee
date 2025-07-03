@@ -26,11 +26,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        // 1️⃣ Busca el usuario en la base de datos
+        // Busca el usuario en la BD
         Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
                 .orElse(null);
 
-        // 2️⃣ Valida que exista y que la contraseña coincida
+        
+        //  Validar que exista y que la contraseña coincida
         if (usuario != null && usuario.getPassword().equals(request.getPassword())) {
 
 
@@ -38,10 +39,10 @@ public class AuthController {
                     .map(r -> r.getNombreRol().name())
                     .collect(Collectors.toList());
 
-            // 4️⃣ Genera el token con roles
+            //  el token con roles
             String token = jwtUtil.generateToken(usuario.getUsername(), roles);
 
-            // 5️⃣ Devuelve la respuesta con el token
+            //  respuesta con el token
             return ResponseEntity.ok(new AuthResponse(token));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
