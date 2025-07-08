@@ -1,7 +1,8 @@
 package org.example.tutorias11.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "tutorias")
@@ -29,8 +30,16 @@ public class Tutoria {
     @Column(nullable = false)
     private String correoTutor;
 
-    // Getters y setters
 
+    @ManyToMany
+    @JoinTable(
+            name = "tutoria_estudiantes",
+            joinColumns = @JoinColumn(name = "tutoria_id"),
+            inverseJoinColumns = @JoinColumn(name = "estudiante_id")
+    )
+    private Set<Usuario> estudiantes = new HashSet<>();
+
+    // === Getters & Setters ===
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -51,4 +60,15 @@ public class Tutoria {
 
     public String getCorreoTutor() { return correoTutor; }
     public void setCorreoTutor(String correoTutor) { this.correoTutor = correoTutor; }
+
+    public Set<Usuario> getEstudiantes() { return estudiantes; }
+    public void setEstudiantes(Set<Usuario> estudiantes) { this.estudiantes = estudiantes; }
+
+    public void addEstudiante(Usuario estudiante) {
+        this.estudiantes.add(estudiante);
+    }
+
+    public void removeEstudiante(Usuario estudiante) {
+        this.estudiantes.remove(estudiante);
+    }
 }

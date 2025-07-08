@@ -10,4 +10,5 @@ public interface TutoriaService {
     TutoriaDTO getById(Long id);
     TutoriaDTO updateTutoria(Long id, TutoriaDTO dto);
     void deleteTutoria(Long id);
+    void registrarEstudiante(Long tutoriaId, String username);
 }

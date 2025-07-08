@@ -4,7 +4,9 @@ import org.example.tutorias11.dto.TutoriaDTO;
 import org.example.tutorias11.exception.ResourceNotFoundException;
 import org.example.tutorias11.mapper.TutoriaMapper;
 import org.example.tutorias11.model.Tutoria;
+import org.example.tutorias11.model.Usuario;
 import org.example.tutorias11.repository.TutoriaRepository;
+import org.example.tutorias11.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,10 +16,12 @@ import java.util.stream.Collectors;
 public class TutoriaServiceImpl implements TutoriaService {
 
     private final TutoriaRepository repository;
+    private final UsuarioRepository usuarioRepository;
     private final TutoriaMapper mapper;
 
-    public TutoriaServiceImpl(TutoriaRepository repository, TutoriaMapper mapper) {
+    public TutoriaServiceImpl(TutoriaRepository repository, UsuarioRepository usuarioRepository, TutoriaMapper mapper) {
         this.repository = repository;
+        this.usuarioRepository = usuarioRepository;
         this.mapper = mapper;
     }
 
@@ -63,5 +67,19 @@ public class TutoriaServiceImpl implements TutoriaService {
         Tutoria tutoria = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tutoria no encontrada con id " + id));
         repository.delete(tutoria);
+    }
+
+    @Override
+    public void registrarEstudiante(Long tutoriaId, String username) {
+        Tutoria tutoria = repository.findById(tutoriaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tutoria no encontrada con id " + tutoriaId));
+
+        Usuario estudiante = usuarioRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + username));
+
+
+        tutoria.getEstudiantes().add(estudiante);
+
+        repository.save(tutoria);
     }
 }
