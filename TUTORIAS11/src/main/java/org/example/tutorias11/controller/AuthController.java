@@ -26,26 +26,33 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        // Busca el usuario en la BD
+        // Busca el usuario en la base de datos
         Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
                 .orElse(null);
 
-        
-        //  Validar que exista y que la contraseña coincida
-        if (usuario != null && usuario.getPassword().equals(request.getPassword())) {
-
-
-            List<String> roles = usuario.getRoles().stream()
-                    .map(r -> r.getNombreRol().name())
-                    .collect(Collectors.toList());
-
-            //  el token con roles
-            String token = jwtUtil.generateToken(usuario.getUsername(), roles);
-
-            //  respuesta con el token
-            return ResponseEntity.ok(new AuthResponse(token));
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
+        // Validar usuario
+        if (usuario == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Usuario incorrecto");
         }
+
+        // Validar contraseña
+        if (!usuario.getPassword().equals(request.getPassword())) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Contraseña incorrecta");
+        }
+
+        // Generar roles
+        List<String> roles = usuario.getRoles().stream()
+                .map(r -> r.getNombreRol().name())
+                .collect(Collectors.toList());
+
+        // Generar token
+        String token = jwtUtil.generateToken(usuario.getUsername(), roles);
+
+        // Responder con token
+        return ResponseEntity.ok(new AuthResponse(token));
     }
 }
